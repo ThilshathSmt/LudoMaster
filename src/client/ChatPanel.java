@@ -33,17 +33,18 @@ public class ChatPanel extends JPanel {
     private DefaultListModel<String> userListModel;
     private JList<String> userList;
     
-    // Modern Blue Theme Colors
+    // Modern Blue Theme Colors with enhanced borders
     private static final Color PRIMARY_COLOR = new Color(0, 123, 255);
     private static final Color PRIMARY_HOVER = new Color(0, 105, 217);
-    private static final Color DARK_BG = new Color(18, 18, 28);
-    private static final Color PANEL_BG = new Color(25, 30, 48);
-    private static final Color CHAT_BG = new Color(30, 35, 55);
+    private static final Color DARK_BG = new Color(22, 22, 32);
+    private static final Color PANEL_BG = new Color(28, 33, 50);
+    private static final Color CHAT_BG = new Color(33, 38, 58);
     private static final Color SENT_BUBBLE = new Color(0, 123, 255);
-    private static final Color RECEIVED_BUBBLE = new Color(45, 52, 75);
+    private static final Color RECEIVED_BUBBLE = new Color(50, 57, 80);
     private static final Color TEXT_COLOR = new Color(255, 255, 255);
-    private static final Color SECONDARY_TEXT = new Color(160, 170, 190);
-    private static final Color DIVIDER_COLOR = new Color(40, 45, 65);
+    private static final Color SECONDARY_TEXT = new Color(170, 180, 200);
+    private static final Color DIVIDER_COLOR = new Color(50, 55, 75);
+    private static final Color BORDER_COLOR = new Color(60, 65, 85);
     
     public ChatPanel(String username, ObjectOutputStream out) {
         this.username = username;
@@ -82,13 +83,19 @@ public class ChatPanel extends JPanel {
     private JPanel createUserListPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(PANEL_BG);
-        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        panel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(0, 0, 0, 2, BORDER_COLOR),
+            new EmptyBorder(10, 10, 10, 10)
+        ));
         
         // Header
         JLabel header = new JLabel("Players");
         header.setFont(new Font("Segoe UI", Font.BOLD, 16));
         header.setForeground(TEXT_COLOR);
-        header.setBorder(new EmptyBorder(5, 5, 10, 5));
+        header.setBorder(BorderFactory.createCompoundBorder(
+            new EmptyBorder(5, 5, 10, 5),
+            BorderFactory.createMatteBorder(0, 0, 2, 0, BORDER_COLOR)
+        ));
         panel.add(header, BorderLayout.NORTH);
         
         // User list
@@ -107,7 +114,10 @@ public class ChatPanel extends JPanel {
                     int index, boolean isSelected, boolean cellHasFocus) {
                 JLabel label = (JLabel) super.getListCellRendererComponent(
                     list, value, index, isSelected, cellHasFocus);
-                label.setBorder(new EmptyBorder(8, 10, 8, 10));
+                label.setBorder(BorderFactory.createCompoundBorder(
+                    new EmptyBorder(8, 10, 8, 10),
+                    BorderFactory.createMatteBorder(0, 0, 1, 0, DIVIDER_COLOR)
+                ));
                 label.setOpaque(true);
                 
                 if (isSelected) {
@@ -138,7 +148,7 @@ public class ChatPanel extends JPanel {
         });
         
         JScrollPane scrollPane = new JScrollPane(userList);
-        scrollPane.setBorder(null);
+        scrollPane.setBorder(BorderFactory.createLineBorder(BORDER_COLOR, 1));
         scrollPane.getViewport().setBackground(PANEL_BG);
         panel.add(scrollPane, BorderLayout.CENTER);
         
@@ -172,11 +182,15 @@ public class ChatPanel extends JPanel {
     private JPanel createMessagePanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(CHAT_BG);
+        panel.setBorder(BorderFactory.createLineBorder(BORDER_COLOR, 1));
         
         // Header
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(PANEL_BG);
-        headerPanel.setBorder(new EmptyBorder(12, 15, 12, 15));
+        headerPanel.setBorder(BorderFactory.createCompoundBorder(
+            new EmptyBorder(12, 15, 12, 15),
+            BorderFactory.createMatteBorder(0, 0, 2, 0, BORDER_COLOR)
+        ));
         
         JLabel chatLabel = new JLabel(currentChat);
         chatLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
@@ -192,7 +206,7 @@ public class ChatPanel extends JPanel {
         messagesPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         
         JScrollPane scrollPane = new JScrollPane(messagesPanel);
-        scrollPane.setBorder(null);
+        scrollPane.setBorder(BorderFactory.createLineBorder(DIVIDER_COLOR, 1));
         scrollPane.getViewport().setBackground(CHAT_BG);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
@@ -205,7 +219,10 @@ public class ChatPanel extends JPanel {
     private JPanel createInputPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 0));
         panel.setBackground(PANEL_BG);
-        panel.setBorder(new EmptyBorder(12, 15, 12, 15));
+        panel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(2, 0, 0, 0, BORDER_COLOR),
+            new EmptyBorder(12, 15, 12, 15)
+        ));
         
         // Message input
         messageInput = new JTextArea(2, 30);
@@ -252,7 +269,7 @@ public class ChatPanel extends JPanel {
         
         JScrollPane inputScroll = new JScrollPane(messageInput);
         inputScroll.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(DIVIDER_COLOR, 2),
+            BorderFactory.createLineBorder(BORDER_COLOR, 2),
             BorderFactory.createEmptyBorder(2, 2, 2, 2)
         ));
         panel.add(inputScroll, BorderLayout.CENTER);
@@ -264,6 +281,7 @@ public class ChatPanel extends JPanel {
         sendButton.setForeground(Color.WHITE);
         sendButton.setFocusPainted(false);
         sendButton.setBorderPainted(false);
+        sendButton.setBorder(BorderFactory.createLineBorder(PRIMARY_HOVER, 2));
         sendButton.setPreferredSize(new Dimension(80, 50));
         sendButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
@@ -350,7 +368,10 @@ public class ChatPanel extends JPanel {
         // Message bubble
         JPanel bubble = new JPanel(new BorderLayout(8, 2));
         bubble.setBackground(msg.isSent ? SENT_BUBBLE : RECEIVED_BUBBLE);
-        bubble.setBorder(new EmptyBorder(10, 14, 10, 14));
+        bubble.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(msg.isSent ? PRIMARY_HOVER : BORDER_COLOR, 1),
+            new EmptyBorder(10, 14, 10, 14)
+        ));
         
         // Sender name (if not sent by current user)
         if (!msg.isSent) {

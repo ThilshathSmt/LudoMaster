@@ -5,37 +5,34 @@ import java.awt.*;
 import java.util.Map;
 
 /**
- * Enhanced Ludo Board Panel with modern design
- * Features colorful player tokens, smooth rendering, and attractive styling
+ * Authentic Ludo Board Panel - Classic Ludo Game Design
+ * Features traditional cross-shaped path, colored home areas, and safe zones
  */
 public class BoardPanel extends JPanel {
     private Map<String, Integer> positions;
     
-    // Modern color scheme
-    private static final Color BOARD_BG = new Color(30, 35, 55);
-    private static final Color CELL_BORDER = new Color(50, 60, 85);
-    private static final Color PATH_CELL = new Color(240, 248, 255);
-    private static final Color SAFE_CELL = new Color(144, 238, 144);
+    // Classic Ludo colors
+    private static final Color RED = new Color(239, 68, 68);
+    private static final Color GREEN = new Color(34, 197, 94);
+    private static final Color YELLOW = new Color(250, 204, 21);
+    private static final Color BLUE = new Color(59, 130, 246);
     
-    // Player colors with better visibility
-    private static final Color[] PLAYER_COLORS = {
-        new Color(231, 76, 60),   // Red
-        new Color(52, 152, 219),  // Blue
-        new Color(46, 204, 113),  // Green
-        new Color(241, 196, 15)   // Yellow
-    };
+    private static final Color RED_LIGHT = new Color(254, 202, 202);
+    private static final Color GREEN_LIGHT = new Color(187, 247, 208);
+    private static final Color YELLOW_LIGHT = new Color(254, 249, 195);
+    private static final Color BLUE_LIGHT = new Color(191, 219, 254);
     
-    // Darker shades for borders
-    private static final Color[] PLAYER_BORDERS = {
-        new Color(192, 57, 43),   // Dark Red
-        new Color(41, 128, 185),  // Dark Blue
-        new Color(39, 174, 96),   // Dark Green
-        new Color(243, 156, 18)   // Dark Yellow
-    };
+    private static final Color PATH_COLOR = new Color(255, 255, 255);
+    private static final Color BORDER_COLOR = new Color(0, 0, 0);
+    private static final Color STAR_COLOR = new Color(255, 215, 0);
+    
+    // Board dimensions (15x15 grid)
+    private static final int GRID_SIZE = 15;
+    private static final int CELL_SIZE = 36;
     
     public BoardPanel() {
-        setBackground(BOARD_BG);
-        setPreferredSize(new Dimension(550, 550));
+        setBackground(new Color(240, 240, 245));
+        setPreferredSize(new Dimension(GRID_SIZE * CELL_SIZE + 40, GRID_SIZE * CELL_SIZE + 40));
     }
     
     public void updatePositions(Map<String, Integer> pos) {
@@ -48,217 +45,327 @@ public class BoardPanel extends JPanel {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         
-        // Enable anti-aliasing for smooth graphics
+        // Enable anti-aliasing
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         
-        int cellSize = 35;
-        int grid = 15;
-        int boardWidth = grid * cellSize;
-        int boardHeight = grid * cellSize;
+        int boardSize = GRID_SIZE * CELL_SIZE;
+        int offsetX = (getWidth() - boardSize) / 2;
+        int offsetY = (getHeight() - boardSize) / 2;
         
-        // Center the board
-        int offsetX = (getWidth() - boardWidth) / 2;
-        int offsetY = (getHeight() - boardHeight) / 2;
+        // Draw board shadow
+        g2d.setColor(new Color(0, 0, 0, 40));
+        g2d.fillRoundRect(offsetX + 3, offsetY + 3, boardSize, boardSize, 15, 15);
         
-        // Draw board background with rounded corners
-        g2d.setColor(new Color(245, 245, 250));
-        g2d.fillRoundRect(offsetX - 10, offsetY - 10, boardWidth + 20, boardHeight + 20, 20, 20);
-        
-        // Draw shadow effect
-        g2d.setColor(new Color(0, 0, 0, 30));
-        g2d.fillRoundRect(offsetX - 8, offsetY - 6, boardWidth + 16, boardHeight + 16, 18, 18);
-        
-        // Draw grid cells
-        for (int i = 0; i < grid; i++) {
-            for (int j = 0; j < grid; j++) {
-                int x = offsetX + j * cellSize;
-                int y = offsetY + i * cellSize;
-                
-                // Determine cell type for coloring
-                boolean isSpecialCell = isSpecialPosition(i, j, grid);
-                
-                if (isSpecialCell) {
-                    g2d.setColor(SAFE_CELL);
-                } else if (isPathCell(i, j, grid)) {
-                    g2d.setColor(PATH_CELL);
-                } else {
-                    g2d.setColor(getHomeAreaColor(i, j, grid));
-                }
-                
-                g2d.fillRect(x, y, cellSize, cellSize);
-                
-                // Draw cell border
-                g2d.setColor(CELL_BORDER);
-                g2d.setStroke(new BasicStroke(1.5f));
-                g2d.drawRect(x, y, cellSize, cellSize);
-                
-                // Draw star on safe cells
-                if (isSpecialCell) {
-                    drawStar(g2d, x + cellSize / 2, y + cellSize / 2, 8, 3);
-                }
-            }
-        }
-        
-        // Draw center home circle
-        int centerX = offsetX + boardWidth / 2;
-        int centerY = offsetY + boardHeight / 2;
-        int centerRadius = cellSize * 2;
-        
-        // Draw outer glow
-        for (int i = 3; i > 0; i--) {
-            g2d.setColor(new Color(255, 215, 0, 50 - i * 10));
-            g2d.fillOval(centerX - centerRadius - i * 3, centerY - centerRadius - i * 3, 
-                        (centerRadius + i * 3) * 2, (centerRadius + i * 3) * 2);
-        }
-        
-        g2d.setColor(new Color(255, 215, 0));
-        g2d.fillOval(centerX - centerRadius, centerY - centerRadius, centerRadius * 2, centerRadius * 2);
-        g2d.setColor(new Color(218, 165, 32));
-        g2d.setStroke(new BasicStroke(3));
-        g2d.drawOval(centerX - centerRadius, centerY - centerRadius, centerRadius * 2, centerRadius * 2);
-        
-        // Draw "HOME" text
+        // Draw white board background
         g2d.setColor(Color.WHITE);
-        g2d.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        FontMetrics fm = g2d.getFontMetrics();
-        String homeText = "HOME";
-        int textX = centerX - fm.stringWidth(homeText) / 2;
-        int textY = centerY + fm.getAscent() / 2;
-        g2d.drawString(homeText, textX, textY);
+        g2d.fillRoundRect(offsetX, offsetY, boardSize, boardSize, 15, 15);
+        
+        // Draw four colored home areas (6x6 each) - Traditional Ludo layout
+        drawHomeArea(g2d, offsetX, offsetY, RED_LIGHT, RED); // Top-left (Red)
+        drawHomeArea(g2d, offsetX + 9 * CELL_SIZE, offsetY, GREEN_LIGHT, GREEN); // Top-right (Green)
+        drawHomeArea(g2d, offsetX, offsetY + 9 * CELL_SIZE, YELLOW_LIGHT, YELLOW); // Bottom-left (Yellow)
+        drawHomeArea(g2d, offsetX + 9 * CELL_SIZE, offsetY + 9 * CELL_SIZE, BLUE_LIGHT, BLUE); // Bottom-right (Blue)
+        
+        // Draw the cross-shaped paths
+        drawPaths(g2d, offsetX, offsetY);
+        
+        // Draw home triangles (winning paths)
+        drawHomeTriangles(g2d, offsetX, offsetY);
+        
+        // Draw center home area
+        drawCenterHome(g2d, offsetX + boardSize / 2, offsetY + boardSize / 2);
+        
+        // Draw grid lines
+        drawGridLines(g2d, offsetX, offsetY, boardSize);
         
         // Draw player tokens
         if (positions != null) {
-            int index = 0;
-            for (Map.Entry<String, Integer> entry : positions.entrySet()) {
-                int pos = entry.getValue() % (grid * grid);
-                int x = offsetX + (pos % grid) * cellSize;
-                int y = offsetY + (pos / grid) * cellSize;
-                
-                Color playerColor = PLAYER_COLORS[index % 4];
-                Color borderColor = PLAYER_BORDERS[index % 4];
-                
-                // Draw token shadow
-                g2d.setColor(new Color(0, 0, 0, 80));
-                g2d.fillOval(x + 7, y + 9, cellSize - 12, cellSize - 12);
-                
-                // Draw token
-                g2d.setColor(playerColor);
-                g2d.fillOval(x + 5, y + 5, cellSize - 10, cellSize - 10);
-                
-                // Draw token border
-                g2d.setColor(borderColor);
-                g2d.setStroke(new BasicStroke(2.5f));
-                g2d.drawOval(x + 5, y + 5, cellSize - 10, cellSize - 10);
-                
-                // Draw player initial
-                g2d.setColor(Color.WHITE);
-                g2d.setFont(new Font("Segoe UI", Font.BOLD, 14));
-                String initial = entry.getKey().substring(0, 1).toUpperCase();
-                FontMetrics tokenFm = g2d.getFontMetrics();
-                int initialX = x + (cellSize - tokenFm.stringWidth(initial)) / 2;
-                int initialY = y + (cellSize + tokenFm.getAscent()) / 2 - 2;
-                g2d.drawString(initial, initialX, initialY);
-                
-                // Draw player name below board
-                g2d.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-                index++;
-            }
-            
-            // Draw legend
-            drawLegend(g2d, offsetX, offsetY + boardHeight + 20);
+            drawTokens(g2d, offsetX, offsetY);
         }
     }
     
-    private void drawLegend(Graphics2D g2d, int startX, int startY) {
-        if (positions == null) return;
+    private void drawHomeArea(Graphics2D g2d, int x, int y, Color lightColor, Color darkColor) {
+        // Draw 6x6 colored square
+        g2d.setColor(lightColor);
+        g2d.fillRect(x, y, 6 * CELL_SIZE, 6 * CELL_SIZE);
         
+        // Draw border
+        g2d.setColor(darkColor);
+        g2d.setStroke(new BasicStroke(3));
+        g2d.drawRect(x, y, 6 * CELL_SIZE, 6 * CELL_SIZE);
+        
+        // Draw starting area circles (2x2 grid in center)
+        int centerX = x + (6 * CELL_SIZE) / 2;
+        int centerY = y + (6 * CELL_SIZE) / 2;
+        int circleSize = CELL_SIZE;
+        int spacing = (int)(CELL_SIZE * 1.5);
+        
+        int[][] positions = {
+            {centerX - spacing/2 - circleSize/2, centerY - spacing/2 - circleSize/2},
+            {centerX + spacing/2 - circleSize/2, centerY - spacing/2 - circleSize/2},
+            {centerX - spacing/2 - circleSize/2, centerY + spacing/2 - circleSize/2},
+            {centerX + spacing/2 - circleSize/2, centerY + spacing/2 - circleSize/2}
+        };
+        
+        for (int[] pos : positions) {
+            // Draw circle shadow
+            g2d.setColor(new Color(0, 0, 0, 30));
+            g2d.fillOval(pos[0] + 2, pos[1] + 2, circleSize, circleSize);
+            
+            // Draw circle
+            g2d.setColor(Color.WHITE);
+            g2d.fillOval(pos[0], pos[1], circleSize, circleSize);
+            g2d.setColor(darkColor);
+            g2d.setStroke(new BasicStroke(2.5f));
+            g2d.drawOval(pos[0], pos[1], circleSize, circleSize);
+        }
+    }
+    
+    private void drawPaths(Graphics2D g2d, int offsetX, int offsetY) {
+        // Traditional Ludo has a cross-shaped path around the board
+        // Each arm of the cross is 3 cells wide
+        
+        // Left vertical arm (Red's path going up)
+        for (int row = 0; row < 6; row++) {
+            for (int col = 6; col < 9; col++) {
+                int x = offsetX + col * CELL_SIZE;
+                int y = offsetY + row * CELL_SIZE;
+                g2d.setColor(PATH_COLOR);
+                g2d.fillRect(x, y, CELL_SIZE, CELL_SIZE);
+            }
+        }
+        
+        // Top horizontal arm (Green's path going left)
+        for (int row = 6; row < 9; row++) {
+            for (int col = 9; col < 15; col++) {
+                int x = offsetX + col * CELL_SIZE;
+                int y = offsetY + row * CELL_SIZE;
+                g2d.setColor(PATH_COLOR);
+                g2d.fillRect(x, y, CELL_SIZE, CELL_SIZE);
+            }
+        }
+        
+        // Right vertical arm (Blue's path going down)
+        for (int row = 9; row < 15; row++) {
+            for (int col = 6; col < 9; col++) {
+                int x = offsetX + col * CELL_SIZE;
+                int y = offsetY + row * CELL_SIZE;
+                g2d.setColor(PATH_COLOR);
+                g2d.fillRect(x, y, CELL_SIZE, CELL_SIZE);
+            }
+        }
+        
+        // Bottom horizontal arm (Yellow's path going right)
+        for (int row = 6; row < 9; row++) {
+            for (int col = 0; col < 6; col++) {
+                int x = offsetX + col * CELL_SIZE;
+                int y = offsetY + row * CELL_SIZE;
+                g2d.setColor(PATH_COLOR);
+                g2d.fillRect(x, y, CELL_SIZE, CELL_SIZE);
+            }
+        }
+        
+        // Draw starting positions and safe spots
+        // Red starting position (moved left 4 boxes)
+        drawStartingCircle(g2d, offsetX + 2 * CELL_SIZE, offsetY + 6 * CELL_SIZE, RED);
+        drawStar(g2d, offsetX + (7 * CELL_SIZE) + CELL_SIZE/2, offsetY + (2 * CELL_SIZE) + CELL_SIZE/2, 8);
+        
+        // Green starting position (moved up 4 boxes)
+        drawStartingCircle(g2d, offsetX + 8 * CELL_SIZE, offsetY + 2 * CELL_SIZE, GREEN);
+        drawStar(g2d, offsetX + (12 * CELL_SIZE) + CELL_SIZE/2, offsetY + (7 * CELL_SIZE) + CELL_SIZE/2, 8);
+        
+        // Blue starting position (top of right column - moved right 4 boxes)
+        drawStartingCircle(g2d, offsetX + 12 * CELL_SIZE, offsetY + 8 * CELL_SIZE, BLUE);
+        drawStar(g2d, offsetX + (7 * CELL_SIZE) + CELL_SIZE/2, offsetY + (12 * CELL_SIZE) + CELL_SIZE/2, 8);
+        
+        // Yellow starting position (right of bottom row - moved down 4 boxes)
+        drawStartingCircle(g2d, offsetX + 6 * CELL_SIZE, offsetY + 12 * CELL_SIZE, YELLOW);
+        drawStar(g2d, offsetX + (2 * CELL_SIZE) + CELL_SIZE/2, offsetY + (7 * CELL_SIZE) + CELL_SIZE/2, 8);
+    }
+    
+    private void drawStartingCircle(Graphics2D g2d, int x, int y, Color color) {
+        // Draw a colored circle to mark starting position
+        g2d.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 100));
+        g2d.fillOval(x + 5, y + 5, CELL_SIZE - 10, CELL_SIZE - 10);
+        g2d.setColor(color);
+        g2d.setStroke(new BasicStroke(2.5f));
+        g2d.drawOval(x + 5, y + 5, CELL_SIZE - 10, CELL_SIZE - 10);
+    }
+    
+    private void drawHomeTriangles(Graphics2D g2d, int offsetX, int offsetY) {
+        // Home triangles - colored paths leading to center from each corner
+        // Red home path (from right to center, one row down from middle)
+        for (int i = 0; i < 6; i++) {
+            g2d.setColor(RED);
+            g2d.fillRect(offsetX + (8 + i) * CELL_SIZE, offsetY + 7 * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        }
+        
+        // Green home path (from top to center, vertical like Blue)
+        for (int i = 0; i < 6; i++) {
+            g2d.setColor(GREEN);
+            g2d.fillRect(offsetX + 7 * CELL_SIZE, offsetY + (i + 1) * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        }
+        
+        // Yellow home path (from bottom left, pointing toward center)
+        for (int i = 0; i < 6; i++) {
+            g2d.setColor(YELLOW);
+            g2d.fillRect(offsetX + (i + 1) * CELL_SIZE, offsetY + 7 * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        }
+        
+        // Blue home path (from bottom right, pointing toward center)
+        for (int i = 0; i < 6; i++) {
+            g2d.setColor(BLUE);
+            g2d.fillRect(offsetX + 7 * CELL_SIZE, offsetY + (8 + i) * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        }
+    }
+    
+    private void drawCenterHome(Graphics2D g2d, int centerX, int centerY) {
+        int size = (int)(CELL_SIZE * 1.5);
+        
+        // Draw four colored triangles pointing to center forming a square pattern
+        // Yellow triangle (from bottom - bottom left)
+        int[] yellowX = {centerX - size, centerX, centerX};
+        int[] yellowY = {centerY, centerY, centerY + size};
+        g2d.setColor(YELLOW);
+        g2d.fillPolygon(yellowX, yellowY, 3);
+        g2d.setColor(BORDER_COLOR);
+        g2d.setStroke(new BasicStroke(1.5f));
+        g2d.drawPolygon(yellowX, yellowY, 3);
+        
+        // Green triangle (from top - top right)
+        int[] greenX = {centerX, centerX + size, centerX};
+        int[] greenY = {centerY - size, centerY, centerY};
+        g2d.setColor(GREEN);
+        g2d.fillPolygon(greenX, greenY, 3);
+        g2d.setColor(BORDER_COLOR);
+        g2d.drawPolygon(greenX, greenY, 3);
+        
+        // Blue triangle (from right - bottom right)
+        int[] blueX = {centerX, centerX + size, centerX};
+        int[] blueY = {centerY, centerY, centerY + size};
+        g2d.setColor(BLUE);
+        g2d.fillPolygon(blueX, blueY, 3);
+        g2d.setColor(BORDER_COLOR);
+        g2d.drawPolygon(blueX, blueY, 3);
+        
+        // Red triangle (from left - top left)
+        int[] redX = {centerX - size, centerX, centerX};
+        int[] redY = {centerY, centerY, centerY - size};
+        g2d.setColor(RED);
+        g2d.fillPolygon(redX, redY, 3);
+        g2d.setColor(BORDER_COLOR);
+        g2d.drawPolygon(redX, redY, 3);
+        
+        // Draw center circle
+        int circleSize = (int)(size * 0.6);
+        g2d.setColor(Color.WHITE);
+        g2d.fillOval(centerX - circleSize/2, centerY - circleSize/2, circleSize, circleSize);
+        
+        // Draw star in center
+        g2d.setColor(STAR_COLOR);
+        drawStar(g2d, centerX, centerY, circleSize/3);
+        
+        g2d.setColor(BORDER_COLOR);
+        g2d.setStroke(new BasicStroke(2));
+        g2d.drawOval(centerX - circleSize/2, centerY - circleSize/2, circleSize, circleSize);
+    }
+    
+    private void drawGridLines(Graphics2D g2d, int offsetX, int offsetY, int boardSize) {
+        g2d.setColor(BORDER_COLOR);
+        g2d.setStroke(new BasicStroke(1));
+        
+        // Draw vertical lines
+        for (int i = 0; i <= GRID_SIZE; i++) {
+            int x = offsetX + i * CELL_SIZE;
+            g2d.drawLine(x, offsetY, x, offsetY + boardSize);
+        }
+        
+        // Draw horizontal lines
+        for (int i = 0; i <= GRID_SIZE; i++) {
+            int y = offsetY + i * CELL_SIZE;
+            g2d.drawLine(offsetX, y, offsetX + boardSize, y);
+        }
+        
+        // Draw bold border
+        g2d.setStroke(new BasicStroke(3));
+        g2d.drawRoundRect(offsetX, offsetY, boardSize, boardSize, 15, 15);
+    }
+    
+    private void drawTokens(Graphics2D g2d, int offsetX, int offsetY) {
+        Color[] playerColors = {RED, GREEN, YELLOW, BLUE};
         int index = 0;
-        int legendX = startX;
-        int legendY = startY;
         
         for (Map.Entry<String, Integer> entry : positions.entrySet()) {
-            Color playerColor = PLAYER_COLORS[index % 4];
-            Color borderColor = PLAYER_BORDERS[index % 4];
+            int pos = entry.getValue();
+            Color color = playerColors[index % 4];
             
-            // Draw token
-            g2d.setColor(playerColor);
-            g2d.fillOval(legendX, legendY, 20, 20);
-            g2d.setColor(borderColor);
-            g2d.setStroke(new BasicStroke(2));
-            g2d.drawOval(legendX, legendY, 20, 20);
+            // Convert position to grid coordinates
+            int gridX = pos % GRID_SIZE;
+            int gridY = pos / GRID_SIZE;
             
-            // Draw name
-            g2d.setColor(Color.WHITE);
-            g2d.setFont(new Font("Segoe UI", Font.BOLD, 13));
-            g2d.drawString(entry.getKey(), legendX + 28, legendY + 15);
+            int x = offsetX + gridX * CELL_SIZE;
+            int y = offsetY + gridY * CELL_SIZE;
             
-            legendX += 130;
-            if (legendX > startX + 400) {
-                legendX = startX;
-                legendY += 30;
-            }
+            drawToken(g2d, x, y, color, entry.getKey());
             index++;
         }
     }
     
-    private void drawStar(Graphics2D g2d, int centerX, int centerY, int outerRadius, int innerRadius) {
+    private void drawToken(Graphics2D g2d, int x, int y, Color color, String label) {
+        int tokenSize = CELL_SIZE - 8;
+        int centerX = x + CELL_SIZE / 2 - tokenSize / 2;
+        int centerY = y + CELL_SIZE / 2 - tokenSize / 2;
+        
+        // Draw shadow
+        g2d.setColor(new Color(0, 0, 0, 80));
+        g2d.fillOval(centerX + 2, centerY + 2, tokenSize, tokenSize);
+        
+        // Draw token
+        g2d.setColor(color);
+        g2d.fillOval(centerX, centerY, tokenSize, tokenSize);
+        
+        // Draw border
+        g2d.setColor(color.darker());
+        g2d.setStroke(new BasicStroke(2.5f));
+        g2d.drawOval(centerX, centerY, tokenSize, tokenSize);
+        
+        // Draw highlight
+        g2d.setColor(new Color(255, 255, 255, 150));
+        g2d.fillOval(centerX + tokenSize/4, centerY + tokenSize/4, tokenSize/3, tokenSize/3);
+        
+        // Draw label
+        g2d.setColor(Color.WHITE);
+        g2d.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        FontMetrics fm = g2d.getFontMetrics();
+        String initial = label.substring(0, Math.min(1, label.length())).toUpperCase();
+        int textX = centerX + (tokenSize - fm.stringWidth(initial)) / 2;
+        int textY = centerY + (tokenSize + fm.getAscent()) / 2 - 2;
+        g2d.drawString(initial, textX, textY);
+    }
+    
+    private void drawStar(Graphics2D g2d, int centerX, int centerY, int radius) {
         int points = 5;
         int[] xPoints = new int[points * 2];
         int[] yPoints = new int[points * 2];
+        int innerRadius = radius / 2;
         
         for (int i = 0; i < points * 2; i++) {
             double angle = Math.PI / 2 + (i * Math.PI / points);
-            int radius = (i % 2 == 0) ? outerRadius : innerRadius;
-            xPoints[i] = (int) (centerX + radius * Math.cos(angle));
-            yPoints[i] = (int) (centerY - radius * Math.sin(angle));
+            int r = (i % 2 == 0) ? radius : innerRadius;
+            xPoints[i] = (int) (centerX + r * Math.cos(angle));
+            yPoints[i] = (int) (centerY - r * Math.sin(angle));
         }
         
-        g2d.setColor(new Color(255, 215, 0));
+        g2d.setColor(STAR_COLOR);
         g2d.fillPolygon(xPoints, yPoints, points * 2);
-    }
-    
-    private boolean isSpecialPosition(int i, int j, int grid) {
-        // Define special safe positions (simplified for demo)
-        int mid = grid / 2;
-        return (i == mid && j == 2) || (i == 2 && j == mid) || 
-               (i == mid && j == grid - 3) || (i == grid - 3 && j == mid);
-    }
-    
-    private boolean isPathCell(int i, int j, int grid) {
-        int mid = grid / 2;
-        // Main paths
-        return (i == mid) || (j == mid) || 
-               (i == mid - 1) || (i == mid + 1) || 
-               (j == mid - 1) || (j == mid + 1);
-    }
-    
-    private Color getHomeAreaColor(int i, int j, int grid) {
-        int third = grid / 3;
-        
-        // Top-left (Red)
-        if (i < third && j < third) {
-            return new Color(255, 200, 200);
-        }
-        // Top-right (Blue)
-        if (i < third && j > grid - third) {
-            return new Color(200, 220, 255);
-        }
-        // Bottom-left (Green)
-        if (i > grid - third && j < third) {
-            return new Color(200, 255, 200);
-        }
-        // Bottom-right (Yellow)
-        if (i > grid - third && j > grid - third) {
-            return new Color(255, 255, 200);
-        }
-        
-        return new Color(250, 250, 255);
+        g2d.setColor(STAR_COLOR.darker());
+        g2d.setStroke(new BasicStroke(1));
+        g2d.drawPolygon(xPoints, yPoints, points * 2);
     }
     
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(550, 550);
+        return new Dimension(GRID_SIZE * CELL_SIZE + 40, GRID_SIZE * CELL_SIZE + 40);
     }
 }
-
