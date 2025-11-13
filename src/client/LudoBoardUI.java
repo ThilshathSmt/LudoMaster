@@ -45,9 +45,9 @@ public class LudoBoardUI extends JFrame {
         // Create main layout with modern design
         initializeComponents();
 
-        setSize(1200, 750);
+        setSize(1300, 800);
         setLocationRelativeTo(null);
-        setMinimumSize(new Dimension(1000, 600));
+        setMinimumSize(new Dimension(1100, 700));
         setVisible(true);
     }
     
@@ -105,9 +105,9 @@ public class LudoBoardUI extends JFrame {
         
         // Create split pane
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, boardContainer, chatPanel);
-        splitPane.setDividerLocation(600);
+        splitPane.setDividerLocation(680);
         splitPane.setDividerSize(3);
-        splitPane.setResizeWeight(0.6); // Give 60% to game board
+        splitPane.setResizeWeight(0.65); // Give 65% to game board
         splitPane.setBorder(null);
         splitPane.setBackground(DARK_BG);
         
